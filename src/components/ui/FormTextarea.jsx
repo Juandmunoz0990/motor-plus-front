@@ -1,0 +1,23 @@
+const FormTextarea = ({ label, name, value, onChange, error, required = false, rows = 4, ...props }) => {
+  return (
+    <div className="mb-4">
+      <label htmlFor={name} className="label">
+        {label} {required && <span className="text-accent-500">*</span>}
+      </label>
+      <textarea
+        id={name}
+        name={name}
+        value={value || ''}
+        onChange={onChange}
+        rows={rows}
+        className={`input ${error ? 'border-accent-500 focus:ring-accent-500' : ''}`}
+        required={required}
+        {...props}
+      />
+      {error && <p className="mt-1 text-sm text-accent-600">{error}</p>}
+    </div>
+  );
+};
+
+export default FormTextarea;
+
