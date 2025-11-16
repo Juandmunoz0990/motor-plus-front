@@ -53,11 +53,13 @@ src/
 
 ## 🔌 Configuración de API
 
-Crea un archivo `.env` en la raíz del proyecto:
+Crea un archivo `.env` en la raíz del proyecto basándote en el ejemplo:
 
 ```env
 VITE_API_BASE_URL=http://localhost:8080/api
 ```
+
+**Nota:** El archivo `.env` no se incluye en el repositorio por seguridad. Asegúrate de crear tu propio archivo `.env` con las variables de entorno necesarias.
 
 ## ✅ Funcionalidades Implementadas
 
