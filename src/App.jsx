@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Clients from './pages/Clients';
 import Orders from './pages/Orders';
@@ -10,12 +12,29 @@ import Mechanics from './pages/Mechanics';
 import Suppliers from './pages/Suppliers';
 import Vehicles from './pages/Vehicles';
 import Reports from './pages/Reports';
+import { authService } from './services/authService';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        {/* Ruta pública de login */}
+        <Route 
+          path="/login" 
+          element={
+            authService.isAuthenticated() ? <Navigate to="/" replace /> : <Login />
+          } 
+        />
+        
+        {/* Rutas protegidas */}
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="clients" element={<Clients />} />
           <Route path="orders" element={<Orders />} />
