@@ -29,6 +29,11 @@ export const authService = {
     return localStorage.getItem('username');
   },
 
+  register: async (username, email, password) => {
+    const response = await api.post('/auth/register', { username, email, password });
+    return response.data;
+  },
+
   changePassword: async (currentPassword, newPassword) => {
     const response = await api.post('/auth/change-password', {
       currentPassword,

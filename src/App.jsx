@@ -45,8 +45,10 @@ function App() {
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="vehicles" element={<Vehicles />} />
           <Route path="reports" element={<Reports />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
+
+        {/* Cualquier ruta desconocida va al login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

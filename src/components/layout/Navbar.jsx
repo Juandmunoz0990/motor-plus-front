@@ -1,12 +1,14 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Wrench, Menu, X, Home, Users, Car, FileText, UserCheck, Settings, Package, Truck, Receipt, BarChart3, Lock } from 'lucide-react';
+import { Wrench, Menu, X, Home, Users, Car, FileText, UserCheck, Settings, Package, Truck, Receipt, BarChart3, Lock, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { authService } from '../../services/authService';
 import ChangePasswordModal from '../ChangePasswordModal';
+import RegisterAdminModal from '../RegisterAdminModal';
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -58,7 +60,15 @@ const Navbar = () => {
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-3">
-            <button 
+            <button
+              onClick={() => setShowRegisterModal(true)}
+              className="inline-flex items-center px-3 py-2 border border-secondary-300 text-sm leading-4 font-medium rounded-md text-secondary-700 bg-white hover:bg-secondary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              title="Registrar nuevo administrador"
+            >
+              <UserPlus className="h-4 w-4 mr-1" />
+              Nuevo Admin
+            </button>
+            <button
               onClick={() => setShowChangePasswordModal(true)}
               className="inline-flex items-center px-3 py-2 border border-secondary-300 text-sm leading-4 font-medium rounded-md text-secondary-700 bg-white hover:bg-secondary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               title="Cambiar contraseña"
@@ -66,7 +76,7 @@ const Navbar = () => {
               <Lock className="h-4 w-4 mr-1" />
               Contraseña
             </button>
-            <button 
+            <button
               onClick={handleLogout}
               className="inline-flex items-center px-3 py-2 border border-primary-500 text-sm leading-4 font-medium rounded-md text-primary-600 bg-primary-50 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             >
@@ -120,9 +130,13 @@ const Navbar = () => {
         </div>
       )}
 
-      <ChangePasswordModal 
-        isOpen={showChangePasswordModal} 
-        onClose={() => setShowChangePasswordModal(false)} 
+      <ChangePasswordModal
+        isOpen={showChangePasswordModal}
+        onClose={() => setShowChangePasswordModal(false)}
+      />
+      <RegisterAdminModal
+        isOpen={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
       />
     </nav>
   );
