@@ -427,7 +427,8 @@ const Orders = () => {
       loadOrders();
     } catch (error) {
       console.error('Error changing status:', error);
-      alert('Error al cambiar el estado');
+      const errorMessage = error.response?.data?.message || 'Error al cambiar el estado';
+      alert(errorMessage);
     }
   };
 
@@ -575,13 +576,15 @@ const Orders = () => {
                                 <CheckCircle className="h-5 w-5" />
                               </button>
                             )}
-                            <button
-                              onClick={() => handleDelete(order.id)}
-                              className="text-accent-600 hover:text-accent-900"
-                              title="Eliminar"
-                            >
-                              <Trash2 className="h-5 w-5" />
-                            </button>
+                            {order.status !== 'COMPLETED' && (
+                              <button
+                                onClick={() => handleDelete(order.id)}
+                                className="text-accent-600 hover:text-accent-900"
+                                title="Eliminar"
+                              >
+                                <Trash2 className="h-5 w-5" />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>

@@ -1,20 +1,29 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Package } from 'lucide-react';
 import { suppliersService } from '../services/suppliersService';
+import { partsService } from '../services/partsService';
 import Modal from '../components/ui/Modal';
 import FormInput from '../components/ui/FormInput';
+import FormSelect from '../components/ui/FormSelect';
 import Pagination from '../components/ui/Pagination';
 
 const Suppliers = () => {
   const [suppliers, setSuppliers] = useState([]);
+  const [allParts, setAllParts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPartsModalOpen, setIsPartsModalOpen] = useState(false);
+  const [isAddPartModalOpen, setIsAddPartModalOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [supplierParts, setSupplierParts] = useState([]);
+  const [partFormData, setPartFormData] = useState({
+    partId: '',
+    price: '',
+    minQuantity: 1,
+  });
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,6 +33,7 @@ const Suppliers = () => {
 
   useEffect(() => {
     loadSuppliers();
+    loadAllParts();
   }, [currentPage, searchQuery]);
 
   const loadSuppliers = async () => {
@@ -44,14 +54,29 @@ const Suppliers = () => {
     }
   };
 
+  const loadAllParts = async () => {
+    try {
+      const response = await partsService.getAll({ size: 200 });
+      setAllParts(response.data.content || []);
+    } catch (error) {
+      console.error('Error loading parts:', error);
+    }
+  };
+
   const loadSupplierParts = async (supplierId) => {
     try {
-      const response = await suppliersService.getParts(supplierId);
+      const response = await suppliersService.getParts(supplierId, { size: 100 });
       setSupplierParts(response.data.content || []);
-      setIsPartsModalOpen(true);
     } catch (error) {
       console.error('Error loading supplier parts:', error);
+      setSupplierParts([]);
     }
+  };
+
+  const handleViewParts = async (supplier) => {
+    setSelectedSupplier(supplier);
+    await loadSupplierParts(supplier.id);
+    setIsPartsModalOpen(true);
   };
 
   const handleSubmit = async (e) => {
@@ -67,7 +92,8 @@ const Suppliers = () => {
       loadSuppliers();
     } catch (error) {
       console.error('Error saving supplier:', error);
-      alert('Error al guardar el proveedor');
+      const msg = error.response?.data?.message || 'Error al guardar el proveedor';
+      alert(msg);
     }
   };
 
@@ -89,9 +115,49 @@ const Suppliers = () => {
         loadSuppliers();
       } catch (error) {
         console.error('Error deleting supplier:', error);
-        alert('Error al eliminar el proveedor');
+        const msg = error.response?.data?.message || 'Error al eliminar el proveedor';
+        alert(msg);
       }
     }
+  };
+
+  const handleAddPart = () => {
+    setPartFormData({ partId: '', price: '', minQuantity: 1 });
+    setIsAddPartModalOpen(true);
+  };
+
+  const handleAddPartSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await suppliersService.addPart(selectedSupplier.id, {
+        partId: partFormData.partId,
+        price: parseFloat(partFormData.price),
+        minQuantity: parseInt(partFormData.minQuantity) || null,
+      });
+      setIsAddPartModalOpen(false);
+      await loadSupplierParts(selectedSupplier.id);
+    } catch (error) {
+      console.error('Error adding part:', error);
+      const msg = error.response?.data?.message || 'Error al agregar el repuesto';
+      alert(msg);
+    }
+  };
+
+  const handleRemovePart = async (partId) => {
+    if (!window.confirm('¿Eliminar este repuesto del proveedor?')) return;
+    try {
+      await suppliersService.removePart(selectedSupplier.id, partId);
+      await loadSupplierParts(selectedSupplier.id);
+    } catch (error) {
+      console.error('Error removing part:', error);
+      const msg = error.response?.data?.message || 'Error al eliminar el repuesto';
+      alert(msg);
+    }
+  };
+
+  const getPartName = (partId) => {
+    const part = allParts.find((p) => p.id === partId);
+    return part ? `${part.name} (${part.sku})` : partId;
   };
 
   const resetForm = () => {
@@ -99,12 +165,12 @@ const Suppliers = () => {
     setSelectedSupplier(null);
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'EUR',
-    }).format(price);
-  };
+  const formatPrice = (price) =>
+    new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(price);
+
+  // Parts available to add: exclude ones already linked to this supplier
+  const linkedPartIds = new Set(supplierParts.map((p) => p.partId));
+  const availableParts = allParts.filter((p) => !linkedPartIds.has(p.id));
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -206,12 +272,9 @@ const Suppliers = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">
                             <button
-                              onClick={() => {
-                                setSelectedSupplier(supplier);
-                                loadSupplierParts(supplier.id);
-                              }}
+                              onClick={() => handleViewParts(supplier)}
                               className="text-primary-600 hover:text-primary-900"
-                              title="Ver repuestos"
+                              title="Gestionar repuestos"
                             >
                               <Package className="h-5 w-5" />
                             </button>
@@ -248,6 +311,7 @@ const Suppliers = () => {
         </>
       )}
 
+      {/* Modal crear/editar proveedor */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => {
@@ -309,45 +373,69 @@ const Suppliers = () => {
         </form>
       </Modal>
 
+      {/* Modal gestión de repuestos del proveedor */}
       <Modal
         isOpen={isPartsModalOpen}
         onClose={() => setIsPartsModalOpen(false)}
         title={`Repuestos de ${selectedSupplier?.name || ''}`}
         size="lg"
       >
+        <div className="mb-4 flex justify-end">
+          <button
+            onClick={handleAddPart}
+            className="btn btn-primary text-sm flex items-center"
+            disabled={availableParts.length === 0}
+            title={availableParts.length === 0 ? 'Todos los repuestos ya están asociados' : ''}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Agregar Repuesto
+          </button>
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-secondary-200">
             <thead className="bg-secondary-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">
                   Repuesto
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">
                   Precio
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 uppercase">
-                  Cantidad Mínima
+                <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">
+                  Cant. Mínima
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-secondary-500 uppercase">
+                  Acciones
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-secondary-200">
               {supplierParts.length === 0 ? (
                 <tr>
-                  <td colSpan="3" className="px-6 py-4 text-center text-secondary-500">
-                    No hay repuestos asociados
+                  <td colSpan="4" className="px-4 py-4 text-center text-secondary-500">
+                    No hay repuestos asociados a este proveedor
                   </td>
                 </tr>
               ) : (
                 supplierParts.map((part) => (
                   <tr key={part.partId}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-900">
-                      {part.partName || 'N/A'}
+                    <td className="px-4 py-3 text-sm text-secondary-900">
+                      {getPartName(part.partId)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-900">
+                    <td className="px-4 py-3 text-sm text-secondary-900">
                       {formatPrice(part.price)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-500">
-                      {part.minQuantity || '-'}
+                    <td className="px-4 py-3 text-sm text-secondary-500">
+                      {part.minQuantity ?? '-'}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => handleRemovePart(part.partId)}
+                        className="text-accent-600 hover:text-accent-900"
+                        title="Eliminar repuesto del proveedor"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -356,9 +444,60 @@ const Suppliers = () => {
           </table>
         </div>
       </Modal>
+
+      {/* Modal agregar repuesto al proveedor */}
+      <Modal
+        isOpen={isAddPartModalOpen}
+        onClose={() => setIsAddPartModalOpen(false)}
+        title="Agregar Repuesto al Proveedor"
+        size="md"
+      >
+        <form onSubmit={handleAddPartSubmit}>
+          <FormSelect
+            label="Repuesto"
+            name="partId"
+            value={partFormData.partId}
+            onChange={(e) => setPartFormData({ ...partFormData, partId: e.target.value })}
+            options={availableParts.map((p) => ({
+              value: p.id,
+              label: `${p.name} (${p.sku})`,
+            }))}
+            required
+          />
+          <FormInput
+            label="Precio del proveedor"
+            name="price"
+            type="number"
+            step="0.01"
+            min="0"
+            value={partFormData.price}
+            onChange={(e) => setPartFormData({ ...partFormData, price: e.target.value })}
+            required
+          />
+          <FormInput
+            label="Cantidad mínima de pedido (opcional)"
+            name="minQuantity"
+            type="number"
+            min="1"
+            value={partFormData.minQuantity}
+            onChange={(e) => setPartFormData({ ...partFormData, minQuantity: e.target.value })}
+          />
+          <div className="flex justify-end space-x-3 mt-6">
+            <button
+              type="button"
+              onClick={() => setIsAddPartModalOpen(false)}
+              className="btn btn-secondary"
+            >
+              Cancelar
+            </button>
+            <button type="submit" className="btn btn-primary">
+              Agregar
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };
 
 export default Suppliers;
-

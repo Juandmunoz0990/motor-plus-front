@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Package, TrendingUp, TrendingDown } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Package, TrendingUp, TrendingDown, ToggleLeft, ToggleRight } from 'lucide-react';
 import { partsService } from '../services/partsService';
 import Modal from '../components/ui/Modal';
 import FormInput from '../components/ui/FormInput';
@@ -112,6 +112,16 @@ const Parts = () => {
   const handleMovement = (part) => {
     setSelectedPart(part);
     setIsMovementModalOpen(true);
+  };
+
+  const handleToggleActive = async (part) => {
+    try {
+      await partsService.setActive(part.id, !part.active);
+      loadParts();
+    } catch (error) {
+      console.error('Error toggling part status:', error);
+      alert('Error al cambiar el estado del repuesto');
+    }
   };
 
   const resetForm = () => {
@@ -251,6 +261,13 @@ const Parts = () => {
                               title="Registrar movimiento"
                             >
                               <Package className="h-5 w-5" />
+                            </button>
+                            <button
+                              onClick={() => handleToggleActive(part)}
+                              className={part.active ? 'text-success-600 hover:text-success-900' : 'text-secondary-400 hover:text-secondary-700'}
+                              title={part.active ? 'Desactivar' : 'Activar'}
+                            >
+                              {part.active ? <ToggleRight className="h-5 w-5" /> : <ToggleLeft className="h-5 w-5" />}
                             </button>
                             <button
                               onClick={() => handleEdit(part)}

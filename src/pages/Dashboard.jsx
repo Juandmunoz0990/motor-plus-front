@@ -66,14 +66,19 @@ const Dashboard = () => {
           invoicesService.getAll({ size: 1 }),
         ]);
 
-        // Obtener órdenes pendientes y completadas
-        const allOrders = await ordersService.getAll({ size: 100 });
-        const pendingOrders = allOrders.data.content?.filter(
-          (order) => order.status === 'DRAFT' || order.status === 'IN_PROGRESS'
-        ).length || 0;
-        const completedOrders = allOrders.data.content?.filter(
-          (order) => order.status === 'COMPLETED'
-        ).length || 0;
+        // Contar órdenes por estado usando totalElements del servidor
+        const [draftRes, scheduledRes, inProgressRes, completedRes] = await Promise.all([
+          ordersService.getAll({ size: 1, status: 'DRAFT' }),
+          ordersService.getAll({ size: 1, status: 'SCHEDULED' }),
+          ordersService.getAll({ size: 1, status: 'IN_PROGRESS' }),
+          ordersService.getAll({ size: 1, status: 'COMPLETED' }),
+        ]);
+
+        const pendingOrders =
+          (draftRes.data.totalElements || 0) +
+          (scheduledRes.data.totalElements || 0) +
+          (inProgressRes.data.totalElements || 0);
+        const completedOrders = completedRes.data.totalElements || 0;
 
         setStats({
           clients: clientsRes.data.totalElements || 0,

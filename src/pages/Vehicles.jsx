@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Search, Eye, Car, History, Plus, Edit, Trash2 } from 'lucide-react';
 import { vehiclesService } from '../services/vehiclesService';
 import { clientsService } from '../services/clientsService';
-import { reportsService } from '../services/reportsService';
 import Modal from '../components/ui/Modal';
 import FormInput from '../components/ui/FormInput';
 import FormSelect from '../components/ui/FormSelect';
@@ -65,8 +64,11 @@ const Vehicles = () => {
   const handleViewHistory = async (vehicle) => {
     try {
       setSelectedVehicle(vehicle);
-      const history = await reportsService.vehicleHistory(vehicle.licensePlate);
-      setVehicleHistory(history.data);
+      const response = await vehiclesService.getOrders(vehicle.licensePlate, { size: 100 });
+      setVehicleHistory({
+        orders: response.data.content || [],
+        totalOrders: response.data.totalElements || 0,
+      });
       setIsHistoryModalOpen(true);
     } catch (error) {
       console.error('Error loading vehicle history:', error);
@@ -402,40 +404,43 @@ const Vehicles = () => {
         title={`Historial - ${selectedVehicle?.licensePlate || ''}`}
         size="xl"
       >
-        {vehicleHistory && (
+        {selectedVehicle && vehicleHistory && (
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-secondary-700">Marca</label>
-                <p className="mt-1 text-sm text-secondary-900">{vehicleHistory.brand}</p>
+                <p className="mt-1 text-sm text-secondary-900">{selectedVehicle.brand || '-'}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-secondary-700">Modelo</label>
-                <p className="mt-1 text-sm text-secondary-900">{vehicleHistory.model}</p>
+                <p className="mt-1 text-sm text-secondary-900">{selectedVehicle.model || '-'}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-secondary-700">Año</label>
-                <p className="mt-1 text-sm text-secondary-900">{vehicleHistory.modelYear || '-'}</p>
+                <p className="mt-1 text-sm text-secondary-900">{selectedVehicle.modelYear || '-'}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-secondary-700">Total de Órdenes</label>
-                <p className="mt-1 text-sm text-secondary-900">
-                  {vehicleHistory.totalOrders || 0}
-                </p>
+                <p className="mt-1 text-sm text-secondary-900">{vehicleHistory.totalOrders}</p>
               </div>
             </div>
 
-            {vehicleHistory.orders && vehicleHistory.orders.length > 0 && (
-              <div>
-                <h3 className="text-lg font-semibold text-secondary-900 mb-4">
-                  Órdenes de Trabajo
-                </h3>
+            <div>
+              <h3 className="text-lg font-semibold text-secondary-900 mb-4">
+                Órdenes de Trabajo
+              </h3>
+              {vehicleHistory.orders.length === 0 ? (
+                <p className="text-sm text-secondary-500">No hay órdenes registradas para este vehículo.</p>
+              ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-secondary-200">
                     <thead className="bg-secondary-50">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">
                           Fecha
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">
+                          Descripción
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">
                           Estado
@@ -446,14 +451,26 @@ const Vehicles = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-secondary-200">
-                      {vehicleHistory.orders.map((order, index) => (
-                        <tr key={index}>
+                      {vehicleHistory.orders.map((order) => (
+                        <tr key={order.id}>
                           <td className="px-4 py-3 text-sm text-secondary-900">
                             {formatDate(order.createdAt)}
                           </td>
+                          <td className="px-4 py-3 text-sm text-secondary-500 max-w-xs truncate">
+                            {order.description || '-'}
+                          </td>
                           <td className="px-4 py-3 text-sm">
-                            <span className="px-2 py-1 text-xs font-semibold rounded-full bg-primary-100 text-primary-800">
-                              {order.status}
+                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                              order.status === 'COMPLETED' ? 'bg-success-100 text-success-800' :
+                              order.status === 'IN_PROGRESS' ? 'bg-primary-100 text-primary-800' :
+                              order.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
+                              'bg-secondary-100 text-secondary-800'
+                            }`}>
+                              {order.status === 'COMPLETED' ? 'Completada' :
+                               order.status === 'IN_PROGRESS' ? 'En Progreso' :
+                               order.status === 'SCHEDULED' ? 'Programada' :
+                               order.status === 'CANCELLED' ? 'Cancelada' :
+                               order.status === 'DRAFT' ? 'Borrador' : order.status}
                             </span>
                           </td>
                           <td className="px-4 py-3 text-sm font-medium text-secondary-900">
@@ -464,8 +481,8 @@ const Vehicles = () => {
                     </tbody>
                   </table>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
       </Modal>

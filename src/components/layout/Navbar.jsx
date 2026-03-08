@@ -14,7 +14,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     authService.logout();
-    navigate('/login');
+    window.location.href = '/login';
   };
 
   const navigation = [
@@ -35,34 +35,16 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow-sm border-b border-secondary-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center mr-8">
-              <div className="flex-shrink-0 flex items-center">
-                <Wrench className="h-6 w-6 text-primary-500" />
-                <span className="ml-2 text-xl font-bold text-secondary-900">Motor Plus</span>
-              </div>
-            </Link>
-            <div className="hidden sm:flex sm:space-x-6">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
-                    isActive(item.href)
-                      ? 'border-primary-500 text-primary-600'
-                      : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-3">
+        {/* Fila superior: logo + botones de acción */}
+        <div className="flex justify-between items-center h-14 border-b border-secondary-100">
+          <Link to="/" className="flex items-center">
+            <Wrench className="h-6 w-6 text-primary-500" />
+            <span className="ml-2 text-xl font-bold text-secondary-900">Motor Plus</span>
+          </Link>
+          <div className="hidden sm:flex items-center space-x-3">
             <button
               onClick={() => setShowRegisterModal(true)}
-              className="inline-flex items-center px-3 py-2 border border-secondary-300 text-sm leading-4 font-medium rounded-md text-secondary-700 bg-white hover:bg-secondary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="inline-flex items-center px-3 py-1.5 border border-secondary-300 text-sm font-medium rounded-md text-secondary-700 bg-white hover:bg-secondary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               title="Registrar nuevo administrador"
             >
               <UserPlus className="h-4 w-4 mr-1" />
@@ -70,7 +52,7 @@ const Navbar = () => {
             </button>
             <button
               onClick={() => setShowChangePasswordModal(true)}
-              className="inline-flex items-center px-3 py-2 border border-secondary-300 text-sm leading-4 font-medium rounded-md text-secondary-700 bg-white hover:bg-secondary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="inline-flex items-center px-3 py-1.5 border border-secondary-300 text-sm font-medium rounded-md text-secondary-700 bg-white hover:bg-secondary-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               title="Cambiar contraseña"
             >
               <Lock className="h-4 w-4 mr-1" />
@@ -78,7 +60,7 @@ const Navbar = () => {
             </button>
             <button
               onClick={handleLogout}
-              className="inline-flex items-center px-3 py-2 border border-primary-500 text-sm leading-4 font-medium rounded-md text-primary-600 bg-primary-50 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="inline-flex items-center px-3 py-1.5 border border-primary-500 text-sm font-medium rounded-md text-primary-600 bg-primary-50 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             >
               <span className="mr-1">→</span>
               Salir
@@ -96,6 +78,22 @@ const Navbar = () => {
               )}
             </button>
           </div>
+        </div>
+        {/* Fila inferior: links de navegación */}
+        <div className="hidden sm:flex sm:space-x-6 h-10 items-center">
+          {navigation.map((item) => (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={`inline-flex items-center px-1 h-full border-b-2 text-sm font-medium transition-colors ${
+                isActive(item.href)
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300'
+              }`}
+            >
+              {item.name}
+            </Link>
+          ))}
         </div>
       </div>
 
