@@ -183,7 +183,8 @@ const Orders = () => {
         loadOrders();
       } catch (error) {
         console.error('Error deleting order:', error);
-        alert('Error al eliminar la orden');
+        const errorMessage = error.response?.data?.message || 'Error al eliminar la orden';
+        alert(errorMessage);
       }
     }
   };

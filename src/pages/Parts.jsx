@@ -104,7 +104,7 @@ const Parts = () => {
         loadParts();
       } catch (error) {
         console.error('Error deleting part:', error);
-        alert('Error al eliminar el repuesto');
+        alert(error.response?.data?.message || 'Error al eliminar el repuesto');
       }
     }
   };
