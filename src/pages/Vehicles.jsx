@@ -57,7 +57,7 @@ const Vehicles = () => {
       setClients(clientsList);
     } catch (error) {
       console.error('Error loading clients:', error);
-      alert('Error al cargar los clientes. Por favor, recarga la página.');
+      alert(error.response?.data?.message || 'Error al cargar los clientes. Por favor, recarga la página.');
     }
   };
 
@@ -72,7 +72,7 @@ const Vehicles = () => {
       setIsHistoryModalOpen(true);
     } catch (error) {
       console.error('Error loading vehicle history:', error);
-      alert('Error al cargar el historial del vehículo');
+      alert(error.response?.data?.message || 'Error al cargar el historial del vehículo');
     }
   };
 

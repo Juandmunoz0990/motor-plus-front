@@ -59,7 +59,7 @@ const Clients = () => {
       loadClients();
     } catch (error) {
       console.error('Error saving client:', error);
-      alert('Error al guardar el cliente');
+      alert(error.response?.data?.message || 'Error al guardar el cliente');
     }
   };
 
@@ -81,7 +81,7 @@ const Clients = () => {
         loadClients();
       } catch (error) {
         console.error('Error deleting client:', error);
-        alert('Error al eliminar el cliente');
+        alert(error.response?.data?.message || 'Error al eliminar el cliente');
       }
     }
   };

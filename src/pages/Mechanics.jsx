@@ -59,7 +59,7 @@ const Mechanics = () => {
       loadMechanics();
     } catch (error) {
       console.error('Error saving mechanic:', error);
-      alert('Error al guardar el mecánico');
+      alert(error.response?.data?.message || 'Error al guardar el mecánico');
     }
   };
 
@@ -82,7 +82,7 @@ const Mechanics = () => {
         loadMechanics();
       } catch (error) {
         console.error('Error deleting mechanic:', error);
-        alert('Error al eliminar el mecánico');
+        alert(error.response?.data?.message || 'Error al eliminar el mecánico');
       }
     }
   };

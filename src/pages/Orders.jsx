@@ -410,6 +410,42 @@ const Orders = () => {
     }
   };
 
+  const handleRemoveItem = async (itemId) => {
+    if (!window.confirm('¿Estás seguro de eliminar este item?')) return;
+    try {
+      await ordersService.removeItem(selectedOrder.id, itemId);
+      await loadOrderItems(selectedOrder.id);
+      loadOrders();
+    } catch (error) {
+      console.error('Error removing item:', error);
+      alert(error.response?.data?.message || 'Error al eliminar el item');
+    }
+  };
+
+  const handleRemoveAssignment = async (itemId, mechanicId) => {
+    if (!window.confirm('¿Estás seguro de eliminar esta asignación?')) return;
+    try {
+      await ordersService.removeAssignment(selectedOrder.id, itemId, mechanicId);
+      await loadOrderItems(selectedOrder.id);
+    } catch (error) {
+      console.error('Error removing assignment:', error);
+      alert(error.response?.data?.message || 'Error al eliminar la asignación');
+    }
+  };
+
+  const handleRemoveItemPart = async (itemId, partId) => {
+    if (!window.confirm('¿Estás seguro de eliminar este repuesto?')) return;
+    try {
+      await ordersService.removeItemPart(selectedOrder.id, itemId, partId);
+      await loadOrderItems(selectedOrder.id);
+      loadOrders();
+      loadParts();
+    } catch (error) {
+      console.error('Error removing item part:', error);
+      alert(error.response?.data?.message || 'Error al eliminar el repuesto');
+    }
+  };
+
   const handleDeleteSupervision = async (supervisorId, supervisadoId, orderId) => {
     if (!confirm('¿Estás seguro de eliminar esta supervisión?')) return;
     try {
@@ -779,13 +815,22 @@ const Orders = () => {
                               <p className="text-sm text-secondary-600 mt-1">{item.description}</p>
                             )}
                           </div>
-                          <div className="text-right ml-4">
-                            <p className="font-semibold text-secondary-900">
-                              {formatPrice(item.unitPrice * item.quantity)}
-                            </p>
-                            <p className="text-xs text-secondary-500">
-                              {item.quantity} x {formatPrice(item.unitPrice)}
-                            </p>
+                          <div className="flex items-start gap-3 ml-4">
+                            <div className="text-right">
+                              <p className="font-semibold text-secondary-900">
+                                {formatPrice(item.unitPrice * item.quantity)}
+                              </p>
+                              <p className="text-xs text-secondary-500">
+                                {item.quantity} x {formatPrice(item.unitPrice)}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => handleRemoveItem(item.id)}
+                              className="text-accent-600 hover:text-accent-900"
+                              title="Eliminar item"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
                         </div>
                         
@@ -802,11 +847,20 @@ const Orders = () => {
                                       <UserCheck className="h-3 w-3 inline mr-1" />
                                       {mechanic ? `${mechanic.firstName} ${mechanic.lastName}` : 'Mecánico'}
                                     </span>
-                                    {assignment.estimatedHours && (
-                                      <span className="text-secondary-500">
-                                        {assignment.estimatedHours} hrs
-                                      </span>
-                                    )}
+                                    <div className="flex items-center gap-2">
+                                      {assignment.estimatedHours && (
+                                        <span className="text-secondary-500">
+                                          {assignment.estimatedHours} hrs
+                                        </span>
+                                      )}
+                                      <button
+                                        onClick={() => handleRemoveAssignment(item.id, assignment.mechanicId)}
+                                        className="text-accent-600 hover:text-accent-900"
+                                        title="Eliminar asignación"
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </button>
+                                    </div>
                                   </div>
                                 );
                               })}
@@ -827,9 +881,18 @@ const Orders = () => {
                                       <Package className="h-3 w-3 inline mr-1" />
                                       {partInfo ? `${partInfo.name} (${partInfo.sku})` : 'Repuesto'}
                                     </span>
-                                    <span className="text-secondary-500">
-                                      {part.quantity} x {formatPrice(part.unitPrice)} = {formatPrice(part.quantity * part.unitPrice)}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-secondary-500">
+                                        {part.quantity} x {formatPrice(part.unitPrice)} = {formatPrice(part.quantity * part.unitPrice)}
+                                      </span>
+                                      <button
+                                        onClick={() => handleRemoveItemPart(item.id, part.partId)}
+                                        className="text-accent-600 hover:text-accent-900"
+                                        title="Eliminar repuesto"
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </button>
+                                    </div>
                                   </div>
                                 );
                               })}

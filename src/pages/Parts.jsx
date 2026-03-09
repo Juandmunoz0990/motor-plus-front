@@ -64,7 +64,7 @@ const Parts = () => {
       loadParts();
     } catch (error) {
       console.error('Error saving part:', error);
-      alert('Error al guardar el repuesto');
+      alert(error.response?.data?.message || 'Error al guardar el repuesto');
     }
   };
 
@@ -80,7 +80,7 @@ const Parts = () => {
       loadParts();
     } catch (error) {
       console.error('Error creating movement:', error);
-      alert('Error al registrar el movimiento');
+      alert(error.response?.data?.message || 'Error al registrar el movimiento');
     }
   };
 
@@ -120,7 +120,7 @@ const Parts = () => {
       loadParts();
     } catch (error) {
       console.error('Error toggling part status:', error);
-      alert('Error al cambiar el estado del repuesto');
+      alert(error.response?.data?.message || 'Error al cambiar el estado del repuesto');
     }
   };
 

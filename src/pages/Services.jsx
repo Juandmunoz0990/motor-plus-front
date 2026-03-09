@@ -59,7 +59,7 @@ const Services = () => {
       loadServices();
     } catch (error) {
       console.error('Error saving service:', error);
-      alert('Error al guardar el servicio');
+      alert(error.response?.data?.message || 'Error al guardar el servicio');
     }
   };
 
@@ -81,7 +81,7 @@ const Services = () => {
         loadServices();
       } catch (error) {
         console.error('Error deleting service:', error);
-        alert('Error al eliminar el servicio');
+        alert(error.response?.data?.message || 'Error al eliminar el servicio');
       }
     }
   };
@@ -92,7 +92,7 @@ const Services = () => {
       loadServices();
     } catch (error) {
       console.error('Error toggling service status:', error);
-      alert('Error al cambiar el estado del servicio');
+      alert(error.response?.data?.message || 'Error al cambiar el estado del servicio');
     }
   };
 
