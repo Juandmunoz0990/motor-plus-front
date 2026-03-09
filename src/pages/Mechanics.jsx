@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, UserCheck } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, UserCheck, ToggleLeft, ToggleRight } from 'lucide-react';
 import { mechanicsService } from '../services/mechanicsService';
 import Modal from '../components/ui/Modal';
 import FormInput from '../components/ui/FormInput';
@@ -84,6 +84,16 @@ const Mechanics = () => {
         console.error('Error deleting mechanic:', error);
         alert(error.response?.data?.message || 'Error al eliminar el mecánico');
       }
+    }
+  };
+
+  const handleToggleActive = async (mechanic) => {
+    try {
+      await mechanicsService.setActive(mechanic.id, !mechanic.active);
+      loadMechanics();
+    } catch (error) {
+      console.error('Error toggling mechanic active:', error);
+      alert(error.response?.data?.message || 'Error al cambiar el estado del mecánico');
     }
   };
 
@@ -207,6 +217,13 @@ const Mechanics = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end space-x-2">
+                            <button
+                              onClick={() => handleToggleActive(mechanic)}
+                              className={mechanic.active ? 'text-success-600 hover:text-success-900' : 'text-secondary-400 hover:text-secondary-600'}
+                              title={mechanic.active ? 'Desactivar' : 'Activar'}
+                            >
+                              {mechanic.active ? <ToggleRight className="h-5 w-5" /> : <ToggleLeft className="h-5 w-5" />}
+                            </button>
                             <button
                               onClick={() => handleEdit(mechanic)}
                               className="text-secondary-600 hover:text-secondary-900"

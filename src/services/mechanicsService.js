@@ -6,5 +6,6 @@ export const mechanicsService = {
   create: (data) => api.post('/mechanics', data),
   update: (id, data) => api.put(`/mechanics/${id}`, data),
   delete: (id) => api.delete(`/mechanics/${id}`),
+  setActive: (id, active) => api.patch(`/mechanics/${id}/active`, null, { params: { active } }),
 };
 
