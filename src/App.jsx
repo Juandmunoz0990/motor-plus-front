@@ -12,19 +12,21 @@ import Mechanics from './pages/Mechanics';
 import Suppliers from './pages/Suppliers';
 import Vehicles from './pages/Vehicles';
 import Reports from './pages/Reports';
+import VerifyEmail from './pages/VerifyEmail';
 import { authService } from './services/authService';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Ruta pública de login */}
-        <Route 
-          path="/login" 
+        {/* Rutas públicas */}
+        <Route
+          path="/login"
           element={
             authService.isAuthenticated() ? <Navigate to="/" replace /> : <Login />
-          } 
+          }
         />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         
         {/* Rutas protegidas */}
         <Route 
