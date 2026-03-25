@@ -4,29 +4,29 @@ export const authService = {
   login: async (username, password) => {
     const response = await api.post('/auth/login', { username, password });
     if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('username', response.data.username);
-      localStorage.setItem('email', response.data.email);
+      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('username', response.data.username);
+      sessionStorage.setItem('email', response.data.email);
     }
     return response.data;
   },
 
   logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('email');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('email');
   },
 
   getToken: () => {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
   },
 
   isAuthenticated: () => {
-    return !!localStorage.getItem('token');
+    return !!sessionStorage.getItem('token');
   },
 
   getUsername: () => {
-    return localStorage.getItem('username');
+    return sessionStorage.getItem('username');
   },
 
   register: async (username, email, password) => {
