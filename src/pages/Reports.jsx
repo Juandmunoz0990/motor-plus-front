@@ -669,10 +669,10 @@ const Reports = () => {
   };
 
   const formatPrice = (price) => {
-    if (!price) return '0,00 €';
-    return new Intl.NumberFormat('es-ES', {
+    if (!price) return '$ 0';
+    return new Intl.NumberFormat('es-CO', {
       style: 'currency',
-      currency: 'EUR',
+      currency: 'COP',
     }).format(price);
   };
 

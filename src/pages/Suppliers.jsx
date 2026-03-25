@@ -166,7 +166,7 @@ const Suppliers = () => {
   };
 
   const formatPrice = (price) =>
-    new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(price);
+    new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(price);
 
   // Parts available to add: exclude ones already linked to this supplier
   const linkedPartIds = new Set(supplierParts.map((p) => p.partId));

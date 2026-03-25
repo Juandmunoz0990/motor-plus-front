@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Eye, Plus, Trash2, DollarSign, ArrowRight } from 'lucide-react';
+import { Eye, Plus, Trash2, ArrowRight } from 'lucide-react';
 import { invoicesService } from '../services/invoicesService';
 import { ordersService } from '../services/ordersService';
 import Modal from '../components/ui/Modal';
@@ -174,7 +174,7 @@ const Invoices = () => {
   };
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(price || 0);
+    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(price || 0);
   };
 
   const formatDate = (dateString) => {
