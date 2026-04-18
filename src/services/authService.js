@@ -34,11 +34,6 @@ export const authService = {
     return response.data;
   },
 
-  verifyCode: async (email, code) => {
-    const response = await api.post('/auth/verify-code', { email, code });
-    return response.data;
-  },
-
   changePassword: async (currentPassword, newPassword) => {
     const response = await api.post('/auth/change-password', {
       currentPassword,
