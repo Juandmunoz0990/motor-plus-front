@@ -4,7 +4,6 @@ import { servicesService } from '../services/servicesService';
 import Modal from '../components/ui/Modal';
 import FormInput from '../components/ui/FormInput';
 import FormTextarea from '../components/ui/FormTextarea';
-import FormSelect from '../components/ui/FormSelect';
 import Pagination from '../components/ui/Pagination';
 
 const Services = () => {
@@ -130,8 +129,8 @@ const Services = () => {
       </div>
 
       <div className="card mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary-400" />
             <input
               type="text"
@@ -144,20 +143,18 @@ const Services = () => {
               className="input pl-10"
             />
           </div>
-          <FormSelect
-            label="Estado"
-            name="activeFilter"
+          <select
             value={activeFilter === null ? '' : activeFilter.toString()}
             onChange={(e) => {
               setActiveFilter(e.target.value === '' ? null : e.target.value === 'true');
               setCurrentPage(0);
             }}
-            options={[
-              { value: '', label: 'Todos' },
-              { value: 'true', label: 'Activos' },
-              { value: 'false', label: 'Inactivos' },
-            ]}
-          />
+            className="input sm:w-48"
+          >
+            <option value="">Todos los estados</option>
+            <option value="true">Activos</option>
+            <option value="false">Inactivos</option>
+          </select>
         </div>
       </div>
 
