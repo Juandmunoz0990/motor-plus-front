@@ -48,10 +48,14 @@ const Services = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        price: formData.price !== '' ? parseFloat(formData.price) : null,
+      };
       if (selectedService) {
-        await servicesService.update(selectedService.id, formData);
+        await servicesService.update(selectedService.id, payload);
       } else {
-        await servicesService.create(formData);
+        await servicesService.create(payload);
       }
       setIsModalOpen(false);
       resetForm();
